@@ -33,6 +33,7 @@ func NewPeer(maxPeers int) *Peer {
 	p := &Peer{
 		Hash:     sha1.New(),
 		MaxPeers: peers,
+		PeerLock: &sync.Mutex{},
 		Port:     "8888",
 		Peers:    make(map[string]net.Addr),
 		shutdown: false,
