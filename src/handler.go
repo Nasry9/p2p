@@ -17,9 +17,9 @@ type Handler struct {
 func (handler *Handler) HandleRequest(conn net.Conn) {
 	buffer := make([]byte, MaxBuffer)
 
-	_, err := conn.Read(buffer)
+	n, err := conn.Read(buffer)
 
-	request := string(buffer)
+	request := string(buffer[:n])
 
 	if err != nil {
 		log.Printf("Error reading message from connection [%s]: %s\n", conn.RemoteAddr().String(), err.Error())
