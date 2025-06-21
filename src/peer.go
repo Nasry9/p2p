@@ -32,7 +32,7 @@ type Peer struct {
 func NewPeer(maxPeers int) *Peer {
 	p := &Peer{
 		Hash:     sha1.New(),
-		MaxPeers: peers,
+		MaxPeers: maxPeers,
 		Port:     "8888",
 		Peers:    make(map[string]net.Addr),
 		shutdown: false,
