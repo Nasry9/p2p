@@ -7,13 +7,13 @@ projects with peer-to-peer techniques.
 
 ## Getting started
 
-Currently there are no dependencies that this project is reliant on, so you can build
-the p2p binary directly as such using `wgo` or `go`:
+This project uses Go modules and relies on the `golang.org/x/sys` package for
+handling UNIX signals. Build the p2p binary with the standard Go toolchain:
 
 ```
 $ git clone https://github.com/cpurta/p2p.git
 $ cd p2p/src
-$ wgo build -o p2p
+$ go build -o p2p
 $ mv p2p ../bin
 ```
 
