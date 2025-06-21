@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 )
 
 var MaxBuffer = 1024
@@ -17,9 +18,9 @@ type Handler struct {
 func (handler *Handler) HandleRequest(conn net.Conn) {
 	buffer := make([]byte, MaxBuffer)
 
-	_, err := conn.Read(buffer)
+	n, err := conn.Read(buffer)
 
-	request := string(buffer)
+	request := string(buffer[:n])
 
 	if err != nil {
 		log.Printf("Error reading message from connection [%s]: %s\n", conn.RemoteAddr().String(), err.Error())
@@ -52,14 +53,20 @@ func (handler *Handler) Ping(peer string) bool {
 	if err != nil {
 		log.Printf("Error dialing %s: %s", peer, err.Error())
 	} else {
+		defer conn.Close()
 		conn.Write([]byte(`PING`))
 		status, err := bufio.NewReader(conn).ReadString('\n')
-		if err != nil {
+		if err != nil && err != io.EOF {
 			log.Printf("Error recieving PING from %s: %s\n", peer, err.Error())
 			handler.Server.RemovePeer(peer)
 		} else {
-			log.Printf("Successful response from %s: %s\n", peer, status)
-			response = true
+			status = strings.TrimSpace(status)
+			if status == "PONG" {
+				log.Printf("Successful response from %s: %s\n", peer, status)
+				response = true
+			} else {
+				log.Printf("Unexpected response from %s: %s\n", peer, status)
+			}
 		}
 	}
 
@@ -67,7 +74,7 @@ func (handler *Handler) Ping(peer string) bool {
 }
 
 func (handler *Handler) HealthCheck() []byte {
-	return []byte(`PONG`)
+	return []byte("PONG\n")
 }
 
 func (handler *Handler) RegisterHandler(conn net.Conn) []byte {
